@@ -34,7 +34,7 @@ def checkCoin(notif):
 
 def sendNotification(notif, coinLastPrice):
     if (notif['condition'] == 'less' or notif['condition'] == 'greater'):
-        message = notif['coin_name'] + ' coin is ' + notif['condition'] + ' than Rp ' + f'{int(notif["price_limit"]):,}' + " => @ Rp " + f'{int(coinLastPrice):,}'
+        message = notif['coin_name'] + ' coin is ' + notif['condition'] + ' than Rp ' + "{:,}".format(int(notif["price_limit"])) + " => @ Rp " + "{:,}".format(int(coinLastPrice))
     else :
         message = notif['coin_name'] + ' coin is ' + notif['condition'] + ' Rp ' + notif['price_limit']
 
