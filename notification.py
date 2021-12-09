@@ -5,11 +5,11 @@ from dotenv import load_dotenv
 from pathlib import Path
 import os
 
-selectTable = SelectTable.SelectTable()
-notifications = selectTable.allNotifications()
-
 def checkCoin(notif):
-    result = False
+    result = {
+        "status": False,
+        "message": ""
+    }
     baseUrl = 'https://indodax.com/api/ticker/'
     endpoint = notif['coin_name'].lower() + 'idr'
     response = requests.get(baseUrl + endpoint)
@@ -19,26 +19,27 @@ def checkCoin(notif):
 
     if (notif['condition'] == 'less'):
         if (notif['price_limit'] > coinLastPrice):
-            sendNotification(notif, coinLastPrice)
-            result = True
+            result['status'] = True
     elif (notif['condition'] == 'greater'):
         if (notif['price_limit'] < coinLastPrice):
-            sendNotification(notif, coinLastPrice)
-            result = True
+            result['status'] = True
     elif (notif['condition'] == 'equal'):
         if (coinLastPrice == notif['price_limit']):
-            sendNotification(notif, coinLastPrice)
-            result = True
+            result['status'] = True
+
+    if (result['status'] == True):
+        result['message'] = formNotifMessage(notif, coinLastPrice)
 
     return result
 
-def sendNotification(notif, coinLastPrice):
+def formNotifMessage(notif, coinLastPrice):
+    message = ""
     if (notif['condition'] == 'less' or notif['condition'] == 'greater'):
         message = notif['coin_name'] + ' coin is ' + notif['condition'] + ' than Rp ' + "{:,}".format(int(notif["price_limit"])) + " => @ Rp " + "{:,}".format(int(coinLastPrice))
     else :
         message = notif['coin_name'] + ' coin is ' + notif['condition'] + ' Rp ' + notif['price_limit']
 
-    sendTelegram(message)
+    return message
 
 def sendTelegram(message):
     env_path = str(Path('.') / '.env')
@@ -47,5 +48,18 @@ def sendTelegram(message):
     
     response = requests.get(url)
 
+
+selectTable = SelectTable.SelectTable()
+notifications = selectTable.allNotifications()
+messages = []
+
 for notif in notifications:
-    print (checkCoin(notif))
+    checkCoinResult = checkCoin(notif)
+    if (checkCoinResult['status']):
+        messages.append(checkCoinResult['message'])
+
+if (len(messages) > 0):
+    messageSent = '\n=============\n'.join(messages)
+    print(messageSent)
+
+    sendTelegram(messageSent)
