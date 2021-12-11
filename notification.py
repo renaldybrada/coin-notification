@@ -1,4 +1,5 @@
 from database import SelectTable
+from database import UpdateTable
 import requests
 import json
 from dotenv import load_dotenv
@@ -16,13 +17,19 @@ def checkCoin(notif):
     jsonResponse = response.json()
 
     coinLastPrice = jsonResponse['ticker']['last']
+    coinLastLowPrice = jsonResponse['ticker']['low']
+    coinLastHighPrice = jsonResponse['ticker']['high']
+
+    updateTable = UpdateTable.UpdateTable()
 
     if (notif['condition'] == 'less'):
         if (notif['price_limit'] > coinLastPrice):
+            updateTable.notification(notif, coinLastLowPrice)
             result['status'] = True
     elif (notif['condition'] == 'greater'):
         if (notif['price_limit'] < coinLastPrice):
-            result['status'] = True
+            updateTable.notification(notif, coinLastHighPrice)
+            result['status'] = Trues
     elif (notif['condition'] == 'equal'):
         if (coinLastPrice == notif['price_limit']):
             result['status'] = True
