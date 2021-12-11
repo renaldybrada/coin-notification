@@ -17,18 +17,16 @@ def checkCoin(notif):
     jsonResponse = response.json()
 
     coinLastPrice = jsonResponse['ticker']['last']
-    coinLastLowPrice = jsonResponse['ticker']['low']
-    coinLastHighPrice = jsonResponse['ticker']['high']
 
     updateTable = UpdateTable.UpdateTable()
 
     if (notif['condition'] == 'less'):
         if (notif['price_limit'] > coinLastPrice):
-            updateTable.notification(notif, coinLastLowPrice)
+            updateTable.notification(notif, coinLastPrice)
             result['status'] = True
     elif (notif['condition'] == 'greater'):
         if (notif['price_limit'] < coinLastPrice):
-            updateTable.notification(notif, coinLastHighPrice)
+            updateTable.notification(notif, coinLastPrice)
             result['status'] = Trues
     elif (notif['condition'] == 'equal'):
         if (coinLastPrice == notif['price_limit']):
