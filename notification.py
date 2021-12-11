@@ -5,6 +5,7 @@ import json
 from dotenv import load_dotenv
 from pathlib import Path
 import os
+import datetime
 
 def checkCoin(notif):
     result = {
@@ -57,6 +58,9 @@ def sendTelegram(message):
 selectTable = SelectTable.SelectTable()
 notifications = selectTable.allNotifications()
 messages = []
+
+execTime = datetime.datetime.now()
+print(execTime)
 
 for notif in notifications:
     checkCoinResult = checkCoin(notif)
